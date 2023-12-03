@@ -66,9 +66,11 @@ library(tinytex)
 
 ### Introduction
 
-The PalmerPenguins dataset, contained within the "palmerpenguins" package, is an opensource set of data that aims "to provide a great dataset for data exploration & visualization". Collected by Dr Kirsten Gorman and the Palmer Station Antarctica LTER, the data contains much information about three species of penguins (Adelie, Chinstrap and Gentoo) including individual's location, culmen length and depth, body mass and sex. I set out to investigate the relationship between culmen length and depth. The culmen is the dorsal ridge of a bird's upper mandible, making up part of the top of the birds beak.
+The PalmerPenguins dataset, contained within the "palmerpenguins" package, is an opensource set of data that aims "to provide a great dataset for data exploration & visualization". Collected by Dr Kirsten Gorman and the Palmer Station Antarctica LTER, the data contains much information about three species of penguins (Adelie, Chinstrap and Gentoo) including individual's location, culmen length and depth, body mass and sex^4^. I set out to investigate the relationship between culmen length and depth. The culmen is the dorsal ridge of a bird's upper mandible, making up part of the top of the birds beak^5^.
 
 To investigate this relationship I first cleaned the raw data within the palmerpenguins package, and then created an exploratory figure to get a rough idea of the relationship. Next, I undertook statistical tests upon the data to give numerical values that objectively and quantifiable describe the relationship between the culmen length and depth. These tests outputted tables that can be used as results figures, but I also created three more graphs to clearly show the relationships discovered before concluding my findings.
+
+*Teaching of how to undertake the following analysis was done in Lydia France's computer session at the University of Oxford on 09/11/2023. Further instruction was taken from her github repository^6^*
 
 ```{r loading packages, echo=TRUE, messages = FALSE}
 library(ggplot2)
@@ -161,7 +163,7 @@ cor_test_result <- cor.test(culmen_data_clean$culmen_length_mm, culmen_data_clea
 print(cor_test_result)
 ```
 
-*Next the Pearson Correlation Coefficient describes the linear correlation between two variables, calculated a ratio between variable co-variances and the product of the associated standard deviations. Results range from -1 to 1; -1 shows a perfect negative correlation, and 1 a perfect positive correlation. The closer the result is to 0, the worse the correlation.*
+*Next the Pearson Correlation Coefficient describes the linear correlation between two variables, calculated a ratio between variable co-variances and the product of the associated standard deviations. Results range from -1 to 1; -1 shows a perfect negative correlation, and 1 a perfect positive correlation. The closer the result is to 0, the worse the correlation^7^.*
 
 ```{r ANCOVA test}
 # Make sure  species variable is a factor
@@ -173,7 +175,7 @@ anova_model <- lm(culmen_depth_mm ~ culmen_length_mm + species + culmen_length_m
 anova(anova_model)
 ```
 
-*ANCOVA tests are a blend of ANOVA (allowing the differences between multiple means to be assessed) and regression. This allows the effects of categorical variables on a continuous response variable to be assessed, along with the effect of a continuous covariate. Here the response variable is culmen depth, the categorical explanatory variable is species, and the continuous covariate is culmen length. This test also includes interaction terms between all variables to see if these have a significant effect.*
+*ANCOVA tests are a blend of ANOVA (allowing the differences between multiple means to be assessed) and regression. This allows the effects of categorical variables on a continuous response variable to be assessed, along with the effect of a continuous covariate. Here the response variable is culmen depth, the categorical explanatory variable is species, and the continuous covariate is culmen length. This test also includes interaction terms between all variables to see if these have a significant effect^8^.*
 
 ### Results & Discussion
 
@@ -181,7 +183,7 @@ anova(anova_model)
 
 The output of the linear model summary gives a regression slop of -0.08. While a very shallow gradient, the p-value of the t-value shows that it is statistically significantly different from zero, with the chance of this value being obtained by chance being 2.53 x 10\^-5. This shows there is a relationship between the two variables.
 
-Despite the slope being significant, and the F-statistic (=18.26) also showing the model is overall significant (again with a p-value of \<0.05), the adjusted R-squared value is very low, being 0.049. This statistic, termed the coefficient of determination, describes the proportion of the total variance that is explained by the model. In other words, it describes how much of the variance in culmen depth is explained by culmen depth As such, this value shows that only \~5% of the total variance is explained by culmen length, a likely insignificant number.
+Despite the slope being significant, and the F-statistic (=18.26) also showing the model is overall significant (again with a p-value of \<0.05), the adjusted R-squared value is very low, being 0.049. This statistic, termed the coefficient of determination, describes the proportion of the total variance that is explained by the model^9^. In other words, it describes how much of the variance in culmen depth is explained by culmen depth As such, this value shows that only \~5% of the total variance is explained by culmen length, a likely insignificant number.
 
 As well as the above summary table, below is a graph that plots the regression line onto the previous exploratory figure, along with the uncertainty in the slope esitmate. Further, the graph also shows the equation of the slope, as well as the R-squared and F-statistic values and the associated P-value.
 
