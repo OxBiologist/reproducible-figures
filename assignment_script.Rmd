@@ -1,0 +1,355 @@
+---
+title: "Reproducible Figures Assigment"
+output:
+  html_document: default
+  pdf_document: default
+date: "2023-10-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load pdf knit package, echo = FALSE}
+library(tinytex)
+```
+
+## QUESTION 01: Data Visualisation for Science Communication
+
+*Create a figure using the Palmer Penguin dataset that is correct but badly communicates the data. **Do not make a boxplot**.*
+
+*Use the following references to guide you:*
+
+-   [*https://www.nature.com/articles/533452a*](https://www.nature.com/articles/533452a){.uri}
+-   [*https://elifesciences.org/articles/16800*](https://elifesciences.org/articles/16800){.uri}
+
+*Note: Focus on visual elements rather than writing misleading text on it.*
+
+### a) Provide your figure here:
+
+```{r cleaning data etc, echo = FALSE, message = FALSE, waning = FALSE, include=FALSE}
+#load packages:
+library(ggplot2)
+library(palmerpenguins)
+library(janitor)
+library(dplyr)
+
+#cleaning data
+head(penguins_raw)
+
+penguins_clean <- penguins_raw %>%
+  select(-starts_with("Delta")) %>%
+  select(-Comments) %>%
+  clean_names()
+
+head(penguins_clean)
+
+#plotting dataset
+culmen_data <- penguins_clean %>%
+    select(c("culmen_length_mm", "culmen_depth_mm", "species","sex")) %>%
+    na.omit()
+```
+
+```{r bad figure code, echo=FALSE, message = FALSE, warning = FALSE}
+# There is no need to provide the code for your bad figure, just use echo=FALSE so the code is hidden. Make sure your figure is visible after you knit it. 
+library(ggplot2)
+
+bad_plot <- ggplot(culmen_data, aes(x = culmen_length_mm, y = culmen_depth_mm)) +
+  geom_point(aes(color = species), size = 3, alpha = 0.5) +
+  geom_smooth(method = lm, color = "#D21404", size = 2, se = FALSE) +
+  labs(x = "X", y = "Y") +
+  coord_cartesian(xlim = c(20, 60), ylim = c(13, 60)) +
+  scale_x_log10() +
+  scale_color_manual(values = c("#D0312D", "#E3242B", "#B90E0A")) +
+  theme(legend.position = "none")
+
+
+bad_plot
+```
+
+### b) Write about how your design choices mislead the reader about the underlying data (200-300 words).
+
+*Include references.*
+
+This graph, aiming to investigate the correlation between culminate length and depth in the Palmer Penguin data set, has numerous issues that could be misleading. Firstly, there is no title or axis labels leaving the reader clueless as to what the graph is investigating. The lack of legend also means the point colour coding cannot be understood (here it relates to penguin species). On the subject of which, even if there were a legend, the choice of colours would make it near impossible to determine which species a point belongs to as all three colours are incredibly similar. Further, the regression line itself is also red making it a challenge to distinguish (especially for those with colourblindness who struggle to differentiate colours). The colour coding issues are worsened by the translucency of the points, meaning where they overlap the colour changes. Such overlapping points are commonplace here due to the unnecessarily large point size, which also makes reading exact values impossible. In reality, when plotted correctly, this data shows little correlation, with the regression line being drawn through a large cloud of data with little significance. However, the drawing of this graph clusters all the data together in the bottom corner, making the correlation (with the regression line) seem much more significant than reality. This bunching up of the data is caused by axes being much longer than necessary (especially the y axis), despite neither starting at zero. The condensing of the points is also worsened by the x axis being logarithmic. Finally, there is no indication of confidence interval around the regression line, so making the correlation seem more certain than is the case.
+
+------------------------------------------------------------------------
+
+## QUESTION 2: Data Pipeline
+
+*Write a data analysis pipeline in your .rmd RMarkdown file. You should be aiming to write a clear explanation of the steps, the figures visible, as well as clear code.*
+
+*Your code should include the steps practiced in the lab session:*
+
+-   *Load the data*
+
+-   *Appropriately clean the data*
+
+-   *Create an Exploratory Figure (**not a boxplot**)*
+
+-   *Save the figure*
+
+-   ***New**: Run a statistical test*
+
+-   ***New**: Create a Results Figure*
+
+-   *Save the figure*
+
+*An exploratory figure shows raw data, such as the distribution of the data. A results figure demonstrates the stats method chosen, and includes the results of the stats test.*
+
+*Between your code, communicate clearly what you are doing and why.*
+
+*Your text should include:*
+
+-   *Introduction*
+
+-   *Hypothesis*
+
+-   *Stats Method*
+
+-   *Results*
+
+-   *Discussion*
+
+-   *Conclusion*
+
+*You will be marked on the following:*
+
+### a) Your code for readability and functionality
+
+### b) Your figures for communication
+
+### c) Your text communication of your analysis
+
+*Below is a template you can use.*
+
+------------------------------------------------------------------------
+
+### Introduction
+
+The PalmerPenguins dataset, contained within the "palmerpenguins" package, is an opensource set of data that aims "to provide a great dataset for data exploration & visualization". Collected by Dr Kirsten Gorman and the Palmer Station Antarctica LTER, the data contains much information about three species of penguins (Adelie, Chinstrap and Gentoo) including individual's location, culmen length and depth, body mass and sex. I set out to investigate the relationship between culmen length and depth. The culmen is the dorsal ridge of a bird's upper mandible, making up part of the top of the birds beak.
+
+To investigate this relationship I first cleaned the raw data within the palmerpenguins package, and then created an exploratory figure to get a rough idea of the relationship. Next, I undertook statistical tests upon the data to give numerical values that objectively and quantifiable describe the relationship between the culmen length and depth. These tests outputted tables that can be used as results figures, but I also created three more graphs to clearly show the relationships discovered before concluding my findings.
+
+```{r loading packages, echo=TRUE, messages = FALSE}
+library(ggplot2)
+library(palmerpenguins) #contains datasets
+library(janitor)
+library(dplyr)
+library(ragg)
+library(ggpmisc) #allows labelling of statistical test results on graphs
+```
+
+*First the packages required for graphing and investigating the data must be loaded into R*
+
+```{r Loading and cleaning data}
+
+#Extract dataset fron palmerpenguins function and save
+write.csv(penguins_raw, "data/penguins_raw.csv")
+
+#load data from saved version
+penguins_raw <- read.csv("data/penguins_raw.csv")
+
+#look at the table
+head(penguins_raw)
+
+#clean the data
+penguins_clean <- penguins_raw %>%
+  select(-starts_with("Delta")) %>% #remove columns starting with delta
+  select(-Comments) %>% #remove comments columns
+  clean_names() %>% #normalise capitalisations etc.
+    mutate(species = case_when(
+      species == "Adelie Penguin (Pygoscelis adeliae)" ~ "Adelie",
+      species == "Chinstrap penguin (Pygoscelis antarctica)" ~ "Chinstrap",
+      species == "Gentoo penguin (Pygoscelis papua)" ~ "Gentoo"
+    )) #simplify species names
+
+#save clean data
+write.csv(penguins_clean, "data/penguins_clean.csv")
+```
+
+*The penguins_raw dataset has many issues that should be fixed to making using the data much easier. Firstly, the Delta and Comments columns are not useful so can be removed. Next, column titles contain spaces, irregular capitalisations and points instead of underscores. These issues can all be fixed giving standardised nomenclature using the clean_names function in the janitor package. Finally, the species names are very long-winded, so can be simplified to single words. All these changes are put into a new dataset, penguins_clean, which is then saved separately in a data folder.*
+
+```{r Data Exploration}
+#investigating the correlation between culmen depth and length
+
+#subset dataset with relevant information and remove NAs:
+culmen_data_clean <- penguins_clean %>% 
+  select(culmen_length_mm, culmen_depth_mm, species, sex) %>%
+  na.omit()
+
+head(culmen_data_clean)
+
+#create exploeatory plot of culmen depth vs length
+exploratory_plot <- ggplot(culmen_data_clean, aes(x = culmen_length_mm, y = culmen_depth_mm)) +
+  geom_point(aes(color = species)) +
+  labs(x = "Culmen length (mm)", y = "Culmen depth (mm)", title = "Graph to show the correlation\nbetween culmen length and depth") +
+  scale_color_manual(values = c("#D81B60", "#1E88E5", "#FFC107"))+ #colourblind friendly palette 
+    theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))
+
+exploratory_plot
+
+#save exploratory figure
+agg_png("figures/exploratory.png", 
+        width = 15, height = 15, units = "cm", res = 600, scaling = 1)
+exploratory_plot
+dev.off()
+```
+
+*To create an exploratory figure of the relationship between culmen depth and length I first created a new dataset containing only the relevant variables (culmen depth and length, sex and species) and removed any NAs in the data to make plotting and data manipulation easier. I then created a simple scatter plot using ggplot2 showing the depth-length relationship as well as any effects of species (by coding colours accordingly). Finally, I saved this figure in a new folder.*
+
+### Hypotheses
+
+From the exploratory figure, no obvious relationship between culmen length and depth can be seen, with the points giving a large cloud of data. There may be a slight negative correlation, but not one that is obvious. As such, I hypothesise that **there is no significant effect of culmen length on depth across all species.**
+
+However, there is clearly a grouping of data based on species, with Adeile and Chinstrap having a greater depth than Gentoo. Further, within the groups there appears to be a positive correlation between culmen length and depth As such, I also hypothesise that **species has a significant effect on culmen depth** and **within individual species, culmen length has a positive effect on culmen depth**.
+
+### Statistical Methods
+
+In order to investigate my hypotheses, I conducted numerous statistical tests. First, I fit a linear model to the data to see if there is a in fact correlation between culmen length and depth (a gradient that is significantly different from zero) and how much of the variance is explained by said model (as determined by the R-squared value). To further assess the correlation between the two variables, a Pearson's Correlation Coefficient was calculated. Finally, to determine the significance of all variables in explaining culmen depth, an ANCOVA test was conducted including interaction terms.
+
+```{r linear model}
+model <- lm(culmen_depth_mm ~ culmen_length_mm, data = culmen_data_clean) #fit linear model
+summary(model) #view summary of model
+```
+
+*First a linear model was fitted to the data, analysing the relationship between culmen length and depth within the culmen_data_clean dataset. Then I viewed the summary of this model. The culmen_length_mm Estimate term gives the gradient of the regression line, with the t value being the result of a t-test testing if the slope is significantly different from zero (the significance being shown by the P-value). The Adjusted R-squared value gives a measure of how much variance in the data is explained by the model. Finally, the F-statistic describes the overall significance of the model, with the probability of getting that value by chance being explained by the associated p-value.*
+
+```{r correlation coefficient test}
+cor_test_result <- cor.test(culmen_data_clean$culmen_length_mm, culmen_data_clean$culmen_depth_mm)
+
+print(cor_test_result)
+```
+
+*Next the Pearson Correlation Coefficient describes the linear correlation between two variables, calculated a ratio between variable co-variances and the product of the associated standard deviations. Results range from -1 to 1; -1 shows a perfect negative correlation, and 1 a perfect positive correlation. The closer the result is to 0, the worse the correlation.*
+
+```{r ANCOVA test}
+# Make sure  species variable is a factor
+ancova_dataset <- culmen_data_clean
+ancova_dataset$species <- as.factor(ancova_dataset$species)
+
+#ANCOVA model
+anova_model <- lm(culmen_depth_mm ~ culmen_length_mm + species + culmen_length_mm*species, data = ancova_dataset)
+anova(anova_model)
+```
+
+*ANCOVA tests are a blend of ANOVA (allowing the differences between multiple means to be assessed) and regression. This allows the effects of categorical variables on a continuous response variable to be assessed, along with the effect of a continuous covariate. Here the response variable is culmen depth, the categorical explanatory variable is species, and the continuous covariate is culmen length. This test also includes interaction terms between all variables to see if these have a significant effect.*
+
+### Results & Discussion
+
+**Linear Model:**
+
+The output of the linear model summary gives a regression slop of -0.08. While a very shallow gradient, the p-value of the t-value shows that it is statistically significantly different from zero, with the chance of this value being obtained by chance being 2.53 x 10\^-5. This shows there is a relationship between the two variables.
+
+Despite the slope being significant, and the F-statistic (=18.26) also showing the model is overall significant (again with a p-value of \<0.05), the adjusted R-squared value is very low, being 0.049. This statistic, termed the coefficient of determination, describes the proportion of the total variance that is explained by the model. In other words, it describes how much of the variance in culmen depth is explained by culmen depth As such, this value shows that only \~5% of the total variance is explained by culmen length, a likely insignificant number.
+
+As well as the above summary table, below is a graph that plots the regression line onto the previous exploratory figure, along with the uncertainty in the slope esitmate. Further, the graph also shows the equation of the slope, as well as the R-squared and F-statistic values and the associated P-value.
+
+```{r Plotting linear model results}
+#linear model plot
+lm_plot <- ggplot(culmen_data_clean, aes(x = culmen_length_mm, y = culmen_depth_mm)) +
+  geom_point(aes(color = species)) +
+  geom_smooth(method = "lm", se = TRUE, color = "black", size = 1) +
+  labs(x = "Culmen length (mm)", y = "Culmen depth (mm)", title = "Graph to show the correlation between\nculmen length and depth across species") +
+  scale_color_manual(values = c("#D81B60", "#1E88E5", "#FFC107"))+ #colourblind friendly palette 
+  stat_poly_eq(label.y = 1.5,label.x = 0.01, size = 2.75, use_label(c("eq", "adj.R2", "f", "p")))+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5, size = 12))
+  
+lm_plot
+```
+
+**Pearson Correlation Coefficient**
+
+As the gradient was very shallow and there was a low R-squared value, I wanted to further investigate the correlation between the two variables of interest. As such, I calculated a value for the Pearson Correlation Coefficient, outputted as -0.229. This again shows the negative correlation, but the value being close to 0 shows lacking significance. In fact, this value is contained within the 95 percent confidence interval, statistically showing that it is an insignificant correlation.
+
+***From the findings so far I can accept my first hypothesis that there is no significant effect of culmen length on culmen depth, due to the small R-squared value and insignificant correlation coefficient. However there is a slight negative relationship between the two that is significantly different from zero***.
+
+**ANCOVA**
+
+The previous statistical tests suggest there is no significant effect if beak length on depth, with there being a slight negative correlation between the two. However, looking at my exploratory figure there appears to be an effect of species on culmen depth. Further, when looking at each individual species separately, rather than all the data together, there appears to be a significant correlation between culmen length and depth. As such, I conducted an ANCOVA test to see which variables were significant in explaining variance in culmen depth along with any interactions between terms.
+
+The output of this ANCOVA test is shown in the summary table above. As can be seen, there is no significant interaction between culmen length and and species, as such the independent effects of each can be reliably concluded. The p values of both culmen_length_mm and species show both have a significant effect in explaining the variance in culmen depth (with both values being P\<\<0.05). As such I was correct in thinking that species had a significant effect on culmen depth and that, when looking at each species independently, there is a significant effect of culmen length on depth.
+
+To summarise these findings better than is shown in the ANCOVA results table, I created another results figure (shown below). Again, this added to the initial exploratory figure by plotting three separate regression lines - one for each species. The differences between these three lines obviously show an effect of species on culmen depth. On this figure I also included the equations, R-squared values and F-statistics for each regression line. These values are very important in relation to my third hypothesis as they build on the significant findings of the ANCOVA test.
+
+The gradients of all three graphs are positive, being much larger than the previously described negative gradient across all species, suggesting a postive effect of culmen length on depth within species. Further, the F-values are also all larger (and are significant, with a P-value of \<0.001). Finally, and perhaps most importantly, all three regression lines have greater adjusted R-squared values: Adeile = 0.14, Chinstrap = 0.42 and Gentoo = 0.40, compared to that of the overall regression line (=0.05). This shows that when each species is looked at independently, the regression models are much more significant and informative.
+
+***From this final section, I can accept both my second and third hypotheses. The ANCOVA test showed that species has a significant effect on culmen depth, and my final results figure (and the included values for each of the linear models of each species) confirm that culmen length has a significant positive effect on culmen depth within each species.***
+
+```{r Plotting ANCOVA Results}
+#ANCOVA plots
+#species effect plot:
+ANCOVA_plot <- ggplot(culmen_data_clean, aes(x = culmen_length_mm, y = culmen_depth_mm, colour = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, size = 1) +
+  labs(x = "Culmen length (mm)", y = "Culmen depth (mm)", title = "Graph to show the effect of species onculmen depth\nand the effect of culmen length on depth within species") +
+  scale_color_manual(values = c("#D81B60", "#1E88E5", "#FFC107"))+ #colourblind friendly palette 
+   theme(plot.title = element_text(hjust = 0.5))+
+  stat_poly_eq(
+    label.y = c(1.0, 0.95, 0.9),  
+    label.x = c(0.01, 0.01, 0.01),  
+    size = 2.75,
+    use_label(labels = c("eq", "adj.R2", "f", "p"))
+  )+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5, size = 10))+
+  ylim(13.5, 23)
+
+ANCOVA_plot
+```
+
+```{r save figures, echo = TRUE, message = FALSE}
+agg_png("figures/regression_plot.png", 
+       width = 15, height = 15, units = "cm", res = 600, scaling = 1)
+lm_plot
+dev.off()
+
+agg_png("figures/ANCOVA_plot.png", 
+        width = 15, height = 15, units = "cm", res = 600, scaling = 1)
+ANCOVA_plot
+dev.off()
+
+
+```
+
+### Conclusion
+
+In conclusion, the initial linear regression model and pearson correlation coefficient allow me to accept my first hypothesis that there is no significant effect of culmen length on depth across all species. However, as shown by later analysis, this may be a misleading conclusion to make. While there is no significant effect, this isn't a particularly useful result as comparing across many species introduces numerous confounding effects (e.g. overall body size) that may mask true correlations. As such, it is much more informative to compare culmen length and depth independently within each species. The results of the ANCOVA test led me to identify this error in looking at the penguin dataset as a whole, as it showed that both species and culmen length did indeed have a significant effect (confirming my second hypothesis). Upon this realisation, I created the new results figure that confirmed my final hypothesis that there was indeed a significant positive correlation between culmen length and depth within species.
+
+Upon reflection, if I were to conduct this investigation again, I would not include the first hypothesis, nor the initial linear model across all species. Rather, I would investigate effects within species from the start, to avoid making reaching two seemingly divergent conclusions.
+
+------------------------------------------------------------------------
+
+## QUESTION 3: Open Science
+
+### a) GitHub
+
+*Upload your RProject you created for **Question 2** and any files and subfolders used to GitHub. Do not include any identifiers such as your name. Make sure your GitHub repo is public.*
+
+*GitHub link:*
+
+*You will be marked on your repo organisation and readability.*
+
+### b) Share your repo with a partner, download, and try to run their data pipeline.
+
+*Partner's GitHub link:*
+
+*You **must** provide this so I can verify there is no plagiarism between you and your partner.*
+
+### c) Reflect on your experience running their code. (300-500 words)
+
+-   *What elements of your partner's code helped you to understand their data pipeline?*
+
+-   *Did it run? Did you need to fix anything?*
+
+-   *What suggestions would you make for improving their code to make it more understandable or reproducible, and why?*
+
+-   *If you needed to alter your partner's figure using their code, do you think that would be easy or difficult, and why?*
+
+### d) Reflect on your own code based on your experience with your partner's code and their review of yours. (300-500 words)
+
+-   *What improvements did they suggest, and do you agree?*
+
+-   *What did you learn about writing code for other people?*
