@@ -8,67 +8,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## QUESTION 01: Data Visualisation for Science Communication
-
-*Create a figure using the Palmer Penguin dataset that is correct but badly communicates the data. **Do not make a boxplot**.*
-
-*Use the following references to guide you:*
-
--   [*https://www.nature.com/articles/533452a*](https://www.nature.com/articles/533452a){.uri}
--   [*https://elifesciences.org/articles/16800*](https://elifesciences.org/articles/16800){.uri}
-
-*Note: Focus on visual elements rather than writing misleading text on it.*
-
-### a) Provide your figure here:
-
-```{r cleaning data etc, echo = FALSE, message = FALSE, waning = FALSE, include=FALSE}
-#load packages:
-library(ggplot2)
-library(palmerpenguins)
-library(janitor)
-library(dplyr)
-
-#cleaning data
-head(penguins_raw)
-
-penguins_clean <- penguins_raw %>%
-  select(-starts_with("Delta")) %>%
-  select(-Comments) %>%
-  clean_names()
-
-head(penguins_clean)
-
-#plotting dataset
-culmen_data <- penguins_clean %>%
-    select(c("culmen_length_mm", "culmen_depth_mm", "species","sex")) %>%
-    na.omit()
-```
-
-```{r bad figure code, echo=FALSE, message = FALSE, warning = FALSE}
-# There is no need to provide the code for your bad figure, just use echo=FALSE so the code is hidden. Make sure your figure is visible after you knit it. 
-library(ggplot2)
-
-bad_plot <- ggplot(culmen_data, aes(x = culmen_length_mm, y = culmen_depth_mm)) +
-  geom_point(aes(color = species), size = 3, alpha = 0.5) +
-  geom_smooth(method = lm, color = "#D21404", size = 2, se = FALSE) +
-  labs(x = "X", y = "Y") +
-  coord_cartesian(xlim = c(20, 60), ylim = c(13, 60)) +
-  scale_x_log10() +
-  scale_color_manual(values = c("#D0312D", "#E3242B", "#B90E0A")) +
-  theme(legend.position = "none")
-
-
-bad_plot
-```
-
-### b) Write about how your design choices mislead the reader about the underlying data (200-300 words).
-
-*Include references.*
-
-This graph, aiming to investigate the correlation between culminate length and depth in the Palmer Penguin data set, has numerous issues that could be misleading. Firstly, there is no title or axis labels leaving the reader clueless as to what the graph is investigating. The lack of legend also means the point colour coding cannot be understood (here it relates to penguin species)^1^. On the subject of which, even if there were a legend, the choice of colours would make it near impossible to determine which species a point belongs to as all three colours are incredibly similar^1^. Further, the regression line itself is also red making it a challenge to distinguish (especially for those with colourblindness who struggle to differentiate colours^2^). The colour coding issues are worsened by the translucency of the points, meaning where they overlap the colour changes. Such overlapping points are commonplace here due to the unnecessarily large point size, which also makes reading exact values impossible. In reality, when plotted correctly, this data shows little correlation, with the regression line being drawn through a large cloud of data with little significance. However, the drawing of this graph clusters all the data together in the bottom corner, making the correlation (with the regression line) seem much more significant than reality. This bunching up of the data is caused by axes being much longer than necessary (especially the y axis), despite neither starting at zero. The condensing of the points is also worsened by the x axis being logarithmic. Finally, there is no indication of confidence interval around the regression line, so making the correlation seem more certain than is the case^3^.
-
-------------------------------------------------------------------------
-
 ## QUESTION 2: Data Pipeline
 
 *Write a data analysis pipeline in your .rmd RMarkdown file. You should be aiming to write a clear explanation of the steps, the figures visible, as well as clear code.*
@@ -287,37 +226,3 @@ dev.off()
 In conclusion, the initial linear regression model and pearson correlation coefficient allow me to accept my first hypothesis that there is no significant effect of culmen length on depth across all species. However, as shown by later analysis, this may be a misleading conclusion to make. While there is no significant effect, this isn't a particularly useful result as comparing across many species introduces numerous confounding effects (e.g. overall body size) that may mask true correlations. As such, it is much more informative to compare culmen length and depth independently within each species. The results of the ANCOVA test led me to identify this error in looking at the penguin dataset as a whole, as it showed that both species and culmen length did indeed have a significant effect (confirming my second hypothesis). Upon this realisation, I created the new results figure that confirmed my final hypothesis that there was indeed a significant positive correlation between culmen length and depth within species.
 
 Upon reflection, if I were to conduct this investigation again, I would not include the first hypothesis, nor the initial linear model across all species. Rather, I would investigate effects within species from the start, to avoid making reaching two seemingly divergent conclusions.
-
-------------------------------------------------------------------------
-
-## QUESTION 3: Open Science
-
-### a) GitHub
-
-*Upload your RProject you created for **Question 2** and any files and subfolders used to GitHub. Do not include any identifiers such as your name. Make sure your GitHub repo is public.*
-
-*GitHub link:* [***https://github.com/OxBiologist/reproducible-figures***](https://github.com/OxBiologist/reproducible-figures){.uri}
-
-*You will be marked on your repo organisation and readability.*
-
-### b) Share your repo with a partner, download, and try to run their data pipeline.
-
-*Partner's GitHub link:*
-
-*You **must** provide this so I can verify there is no plagiarism between you and your partner.*
-
-### c) Reflect on your experience running their code. (300-500 words)
-
--   *What elements of your partner's code helped you to understand their data pipeline?*
-
--   *Did it run? Did you need to fix anything?*
-
--   *What suggestions would you make for improving their code to make it more understandable or reproducible, and why?*
-
--   *If you needed to alter your partner's figure using their code, do you think that would be easy or difficult, and why?*
-
-### d) Reflect on your own code based on your experience with your partner's code and their review of yours. (300-500 words)
-
--   *What improvements did they suggest, and do you agree?*
-
--   *What did you learn about writing code for other people?*
