@@ -6,6 +6,11 @@ The repository contains the foler reproducible_figures_assignment. Within this f
 - The data used: 
   - penguins_raw 
   - the cleaned dataset (penguins_clean) and
-- Figures produced by the code
-- Functions used to plot figures
+- Figures produced by the code:
+    - exploratory.png
+    - ANCOVA_plot.png
+    - regression_plot.png
+- Functions used:
+    - cleaning.r
+    - plotting.r
 
