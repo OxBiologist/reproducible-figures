@@ -1,10 +1,11 @@
 ## reproducible-figures
 ***This is a public repository of the required files for the Reproducible Figures in R assignment.***
 
-The repository contains:
+The repository contains the foler repro_figures_assignment. Within this folder can be found:
 - The R markdown script for question 2 of the assignment 
 - The data used: 
   - penguins_raw 
   - the cleaned dataset (penguins_clean) and
-- figures that were produced by the code
+- Figures produced by the code
+- Functions used to plot figures
 
