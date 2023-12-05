@@ -150,7 +150,7 @@ summary(model) #view summary of model
 
 ```{r correlation coefficient test}
 cor_test_result <- cor.test(culmen_data_clean$culmen_length_mm, culmen_data_clean$culmen_depth_mm)
-print(cor_test_result)
+cor_test_result
 ```
 
 *Next the Pearson Correlation Coefficient describes the linear correlation between two variables, calculated a ratio between variable co-variances and the product of the associated standard deviations. Results range from -1 to 1; -1 shows a perfect negative correlation, and 1 a perfect positive correlation. The closer the result is to 0, the worse the correlation^7^.*
