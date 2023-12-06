@@ -1,3 +1,4 @@
+#exploratory plot function:
 plot_exploratory <- function(culmen_data_clean){
   culmen_data_clean %>%
     ggplot(aes(x = culmen_length_mm, y = culmen_depth_mm)) +
@@ -8,6 +9,7 @@ plot_exploratory <- function(culmen_data_clean){
     theme(plot.title = element_text(hjust = 0.5))
 }
 
+#linear model results plot function:
 plot_lm <- function(culmen_data_clean){
   culmen_data_clean %>%
     ggplot(aes(x = culmen_length_mm, y = culmen_depth_mm)) +
@@ -20,6 +22,7 @@ plot_lm <- function(culmen_data_clean){
     theme(plot.title = element_text(hjust = 0.5, size = 12))
 }
 
+#ancova result plot:
 plot_anova <- function(culmen_data_clean){
   culmen_data_clean%>%
     ggplot(aes(x = culmen_length_mm, y = culmen_depth_mm, colour = species)) +
