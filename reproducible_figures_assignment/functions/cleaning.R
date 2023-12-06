@@ -1,3 +1,4 @@
+#function shorten species names
 shorten_species <- function(penguins_data) {
   penguins_data %>%
     mutate(species = case_when(
@@ -7,6 +8,7 @@ shorten_species <- function(penguins_data) {
     ))
 }
 
+#function to remobve unnecessary columns
 remove_columns <- function(penguins_raw) {
   penguins_raw %>%
     select(-starts_with("Delta")) %>% #remove columns starting with delta
