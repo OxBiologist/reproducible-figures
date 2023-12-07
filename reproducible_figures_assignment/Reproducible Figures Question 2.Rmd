@@ -161,6 +161,10 @@ ancova_dataset$species <- as.factor(ancova_dataset$species)
 
 #ANCOVA model
 anova_model <- lm(culmen_depth_mm ~ culmen_length_mm + species + culmen_length_mm*species, data = ancova_dataset)
+
+qqnorm(resid(anova_model))
+qqline(resid(anova_model))#testing normality of residuals to show assumptions of ANCOVA are met
+
 anova(anova_model)
 ```
 
@@ -217,6 +221,7 @@ agg_png("figures/ANCOVA_plot.png",
         width = 15, height = 15, units = "cm", res = 600, scaling = 1)
 ANCOVA_plot
 dev.off()
+
 ```
 
 ### Conclusion
