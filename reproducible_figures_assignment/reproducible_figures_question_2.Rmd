@@ -164,6 +164,7 @@ anova_model <- lm(culmen_depth_mm ~ culmen_length_mm + species + culmen_length_m
 
 qqnorm(resid(anova_model))
 qqline(resid(anova_model))#testing normality of residuals to show assumptions of ANCOVA are met
+#points mostly fall on line, so assumptions met well enough
 
 anova(anova_model)
 ```
