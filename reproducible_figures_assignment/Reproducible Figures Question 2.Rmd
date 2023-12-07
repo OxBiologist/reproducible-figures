@@ -1,6 +1,5 @@
 ---
 title: "Reproducible Figures Question 2"
-author: "Finn McHale"
 date: "2023-12-04"
 output: html_document
 ---
